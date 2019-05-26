@@ -1,8 +1,5 @@
 FROM bde2020/hadoop-base:2.0.0-hadoop2.7.4-java8
 
-MAINTAINER Yiannis Mouchakis <gmouchakis@iit.demokritos.gr>
-MAINTAINER Ivan Ermilov <ivan.s.ermilov@gmail.com>
-
 # Allow buildtime config of HIVE_VERSION
 ARG HIVE_VERSION
 # Set HIVE_VERSION from arg if provided at build, env if provided at run, or default
@@ -59,6 +56,38 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 10000
 EXPOSE 10002
+
+
+# to run bower as root
+RUN echo '{ "allow_root": true }' > /root/.bowerrc
+
+# install maven
+RUN curl -s http://mirror.olnevhost.net/pub/apache/maven/binaries/apache-maven-3.2.1-bin.tar.gz | tar -xz -C /usr/local/
+RUN cd /usr/local && ln -s apache-maven-3.2.1 maven
+ENV MAVEN_HOME /usr/local/maven
+ENV PATH $MAVEN_HOME/bin:$PATH
+
+# download tez code, switch to 0.8.4 branch, compile and copy jars
+ENV TEZ_VERSION 0.8.4
+ENV TEZ_DIST /usr/local/tez/tez-dist/target/tez-${TEZ_VERSION}
+RUN cd /usr/local && git clone https://github.com/apache/tez.git
+RUN cd /usr/local/tez && git checkout tags/rel/release-0.8.4 -b branch-0.8 && mvn clean package -DskipTests=true -Dmaven.javadoc.skip=true
+RUN $BOOTSTRAP && $HADOOP_PREFIX/bin/hadoop dfsadmin -safemode leave && $HADOOP_PREFIX/bin/hdfs dfs -put ${TEZ_DIST} /tez
+
+# prepare tez ui
+RUN mkdir /var/www/tez-ui && cd /var/www/tez-ui && jar -xvf ${TEZ_DIST}/tez-ui2-${TEZ_VERSION}.war
+RUN service apache2 restart
+
+# add site files
+ADD conf/tez-site.xml $HADOOP_PREFIX/etc/hadoop/tez-site.xml
+ADD conf/mapred-site.xml $HADOOP_PREFIX/etc/hadoop/mapred-site.xml
+
+# environment settings
+RUN echo 'TEZ_JARS=${TEZ_DIST}/*' >> $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
+RUN echo 'TEZ_LIB=${TEZ_DIST}/lib/*' >> $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
+RUN echo 'TEZ_CONF=/usr/local/hadoop/etc/hadoop' >> $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
+RUN echo 'export HADOOP_CLASSPATH=$HADOOP_CLASSPATH:$TEZ_CONF:$TEZ_JARS:$TEZ_LIB' >> $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh
+
 
 ENTRYPOINT ["entrypoint.sh"]
 CMD startup.sh
