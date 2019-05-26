@@ -65,18 +65,15 @@ RUN echo 'deb http://ppa.launchpad.net/git-core/ppa/ubuntu trusty main' > /etc/a
 RUN apt-get update
 RUN apt-get install -y git
 
-ENV TEZ_DIST = /usr/local/tez
+ENV TEZ_DIST /usr/local/tez
 
 RUN mkdir -p $TEZ_DIST
 # download tez code, switch to 0.8.4 branch, compile and copy jars
 RUN wget http://apache-mirror.rbc.ru/pub/apache/tez/0.9.2/apache-tez-0.9.2-bin.tar.gz
 RUN tar xzf apache-tez-0.9.2-bin.tar.gz
 RUN mv apache-tez-0.9.2-bin $TEZ_DIST
-RUN $BOOTSTRAP && $HADOOP_PREFIX/bin/hadoop dfsadmin -safemode leave && $HADOOP_PREFIX/bin/hdfs dfs -put ./tez /tez
-
-# prepare tez ui
-RUN mkdir /var/www/tez-ui && cd /var/www/tez-ui && jar -xvf ${TEZ_DIST}/tez-ui-0.9.2.war
-RUN service apache2 restart
+RUN $HADOOP_PREFIX/bin/hdfs dfs -mkdir /tez
+RUN $BOOTSTRAP && $HADOOP_PREFIX/bin/hdfs dfs -put $TEZ_DIST /tez
 
 # add site files
 ADD conf/tez-site.xml $HADOOP_PREFIX/etc/hadoop/tez-site.xml

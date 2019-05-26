@@ -17,11 +17,6 @@
 -->
 <configuration>
     <property>
-        <name>hive.druid.broker.address.default</name>
-        <value>172.20.0.1:8082</value>
-    </property>
-
-    <property>
         <name>hive.execution.engine</name>
         <value>tez</value>
     </property>
