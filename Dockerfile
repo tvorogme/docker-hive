@@ -16,9 +16,6 @@ ENV HADOOP_HOME /opt/hadoop-$HADOOP_VERSION
 
 WORKDIR /opt
 RUN cat /etc/apt/sources.list
-#RUN echo "deb [check-valid-until=no] http://archive.debian.org/debian jessie-backports main" > /etc/apt/sources.list.d/jessie-backports.list
-
-# As suggested by a user, for some people this line works instead of the first one. Use whichever works for your case
 RUN echo "deb [check-valid-until=no] http://archive.debian.org/debian jessie main" > /etc/apt/sources.list.d/jessie.list
 
 
@@ -37,6 +34,7 @@ RUN apt-get install -y wget procps && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/*
 
+# MSSQL jdbc driver
 RUN wget https://download.microsoft.com/download/B/F/9/BF9C2615-C802-400C-AC90-F3F29EF07B3B/sqljdbc_6.2.2.1_rus.tar.gz
 RUN tar xzf sqljdbc_6.2.2.1_rus.tar.gz
 RUN mv sqljdbc_6.2/rus/mssql-jdbc-6.2.2.jre8.jar $HIVE_HOME/lib/
