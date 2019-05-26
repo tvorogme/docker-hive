@@ -15,21 +15,31 @@ ENV PATH $HIVE_HOME/bin:$PATH
 ENV HADOOP_HOME /opt/hadoop-$HADOOP_VERSION
 
 WORKDIR /opt
+RUN cat /etc/apt/sources.list
+#RUN echo "deb [check-valid-until=no] http://archive.debian.org/debian jessie-backports main" > /etc/apt/sources.list.d/jessie-backports.list
+
+# As suggested by a user, for some people this line works instead of the first one. Use whichever works for your case
+RUN echo "deb [check-valid-until=no] http://archive.debian.org/debian jessie main" > /etc/apt/sources.list.d/jessie.list
+
+
+RUN sed -i '/deb http:\/\/deb.debian.org\/debian jessie-updates main/d' /etc/apt/sources.list
+RUN sed -i '/deb http:\/\/ftp.debian.org\/debian jessie-backports main/d' /etc/apt/sources.list
+
+RUN apt-get -o Acquire::Check-Valid-Until=false update
 
 #Install Hive and PostgreSQL JDBC
-RUN apt-get update && apt-get install -y wget procps && \
+RUN apt-get install -y wget procps && \
 	wget https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
 	tar -xzvf apache-hive-$HIVE_VERSION-bin.tar.gz && \
 	mv apache-hive-$HIVE_VERSION-bin hive && \
 	wget https://jdbc.postgresql.org/download/postgresql-9.4.1212.jar -O $HIVE_HOME/lib/postgresql-jdbc.jar && \
 	rm apache-hive-$HIVE_VERSION-bin.tar.gz && \
-	apt-get --purge remove -y wget && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/*
 
 RUN wget https://download.microsoft.com/download/B/F/9/BF9C2615-C802-400C-AC90-F3F29EF07B3B/sqljdbc_6.2.2.1_rus.tar.gz
 RUN tar xzf sqljdbc_6.2.2.1_rus.tar.gz
-RUN mv mv sqljdbc_6.2/rus/mssql-jdbc-6.2.2.jre8.jar lib/
+RUN mv sqljdbc_6.2/rus/mssql-jdbc-6.2.2.jre8.jar $HIVE_HOME/lib/
 
 #Spark should be compiled with Hive to be able to use it
 #hive-site.xml should be copied to $SPARK_HOME/conf folder
