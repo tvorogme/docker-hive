@@ -51,9 +51,9 @@ Then query it from PrestoDB. You can get [presto.jar](https://prestosql.io/docs/
 
 ## ToDo
 
-Set druid ip `hive.druid.broker.address.default` in docker not static: `route | head -3 | tail -1 | awk '{print $2}'`
+1. Add all configs as volumes, not by ADD command
 
-Made work druid by default:
+2. Made work druid by default:
 
 `hadoop fs -mkdir -p /opt/hive/lib`<br/>
 `hadoop fs -put $HIVE_HOME/lib/hive-druid-handler-2.3.2.jar $HIVE_HOME/lib/hive-druid-handler-2.3.2.jar`
