@@ -57,32 +57,23 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 EXPOSE 10000
 EXPOSE 10002
 
-
 # to run bower as root
 RUN echo '{ "allow_root": true }' > /root/.bowerrc
-
-# install maven
-RUN curl -s http://mirror.linux-ia64.org/apache/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz | tar -xz -C /usr/local/
-RUN cd /usr/local && ln -s apache-maven-3.6.1 maven
-ENV MAVEN_HOME /usr/local/maven
-ENV PATH $MAVEN_HOME/bin:$PATH
-
 
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
 RUN echo 'deb http://ppa.launchpad.net/git-core/ppa/ubuntu trusty main' > /etc/apt/sources.list.d/git.list
 RUN apt-get update
 RUN apt-get install -y git
 
-
+ENV TEZ_DIST = /usr/local/tez
 # download tez code, switch to 0.8.4 branch, compile and copy jars
-ENV TEZ_VERSION 0.8.4
-ENV TEZ_DIST /usr/local/tez/tez-dist/target/tez-${TEZ_VERSION}
-RUN cd /usr/local && git clone https://github.com/apache/tez.git
-RUN cd /usr/local/tez && git checkout tags/rel/release-0.8.4 -b branch-0.8 && mvn clean package -DskipTests=true -Dmaven.javadoc.skip=true
-RUN $BOOTSTRAP && $HADOOP_PREFIX/bin/hadoop dfsadmin -safemode leave && $HADOOP_PREFIX/bin/hdfs dfs -put ${TEZ_DIST} /tez
+RUN wget http://apache-mirror.rbc.ru/pub/apache/tez/0.9.2/apache-tez-0.9.2-bin.tar.gz
+RUN tar xzf apache-tez-0.9.2-bin.tar.gz
+RUN mv apache-tez-0.9.2-bin $TEZ_DIST
+RUN $BOOTSTRAP && $HADOOP_PREFIX/bin/hadoop dfsadmin -safemode leave && $HADOOP_PREFIX/bin/hdfs dfs -put ./tez /tez
 
 # prepare tez ui
-RUN mkdir /var/www/tez-ui && cd /var/www/tez-ui && jar -xvf ${TEZ_DIST}/tez-ui2-${TEZ_VERSION}.war
+RUN mkdir /var/www/tez-ui && cd /var/www/tez-ui && jar -xvf ${TEZ_DIST}/tez-ui-0.9.2.war
 RUN service apache2 restart
 
 # add site files
