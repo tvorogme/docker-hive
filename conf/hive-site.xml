@@ -14,5 +14,10 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
---><configuration>
+-->
+<configuration>
+    <property>
+        <name>hive.druid.broker.address.default</name>
+        <value>172.19.0.1:8082</value>
+    </property>
 </configuration>

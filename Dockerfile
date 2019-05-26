@@ -27,6 +27,9 @@ RUN apt-get update && apt-get install -y wget procps && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/*
 
+RUN wget https://download.microsoft.com/download/B/F/9/BF9C2615-C802-400C-AC90-F3F29EF07B3B/sqljdbc_6.2.2.1_rus.tar.gz
+RUN tar xzf sqljdbc_6.2.2.1_rus.tar.gz
+RUN mv mv sqljdbc_6.2/rus/mssql-jdbc-6.2.2.jre8.jar lib/
 
 #Spark should be compiled with Hive to be able to use it
 #hive-site.xml should be copied to $SPARK_HOME/conf folder
