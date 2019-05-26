@@ -52,8 +52,4 @@ Then query it from PrestoDB. You can get [presto.jar](https://prestosql.io/docs/
 ## ToDo
 
 1. Add all configs as volumes, not by ADD command
-
-2. Made work druid by default:
-
-`hadoop fs -mkdir -p /opt/hive/lib`<br/>
-`hadoop fs -put $HIVE_HOME/lib/hive-druid-handler-2.3.2.jar $HIVE_HOME/lib/hive-druid-handler-2.3.2.jar`
+2. Add volume to pgsql metastore
