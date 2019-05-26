@@ -66,6 +66,8 @@ RUN apt-get update
 RUN apt-get install -y git
 
 ENV TEZ_DIST = /usr/local/tez
+
+RUN mkdir -p $TEZ_DIST
 # download tez code, switch to 0.8.4 branch, compile and copy jars
 RUN wget http://apache-mirror.rbc.ru/pub/apache/tez/0.9.2/apache-tez-0.9.2-bin.tar.gz
 RUN tar xzf apache-tez-0.9.2-bin.tar.gz
