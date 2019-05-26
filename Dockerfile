@@ -67,6 +67,7 @@ RUN cd /usr/local && ln -s apache-maven-3.6.1 maven
 ENV MAVEN_HOME /usr/local/maven
 ENV PATH $MAVEN_HOME/bin:$PATH
 
+RUN apt-get install -y git
 # download tez code, switch to 0.8.4 branch, compile and copy jars
 ENV TEZ_VERSION 0.8.4
 ENV TEZ_DIST /usr/local/tez/tez-dist/target/tez-${TEZ_VERSION}
