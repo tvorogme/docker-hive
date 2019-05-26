@@ -18,6 +18,6 @@
 <configuration>
     <property>
         <name>hive.druid.broker.address.default</name>
-        <value>172.19.0.1:8082</value>
+        <value>172.20.0.1:8082</value>
     </property>
 </configuration>
