@@ -67,7 +67,13 @@ RUN cd /usr/local && ln -s apache-maven-3.6.1 maven
 ENV MAVEN_HOME /usr/local/maven
 ENV PATH $MAVEN_HOME/bin:$PATH
 
+
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys E1DD270288B4E6030699E45FA1715D88E1DF1F24
+RUN echo 'deb http://ppa.launchpad.net/git-core/ppa/ubuntu trusty main' > /etc/apt/sources.list.d/git.list
+RUN apt-get update
 RUN apt-get install -y git
+
+
 # download tez code, switch to 0.8.4 branch, compile and copy jars
 ENV TEZ_VERSION 0.8.4
 ENV TEZ_DIST /usr/local/tez/tez-dist/target/tez-${TEZ_VERSION}
